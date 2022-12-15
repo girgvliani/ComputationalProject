@@ -8,6 +8,11 @@ with the sizes suitable for matX
 def createMatrix(matX):
     pass
 
+
+'''
+gramShmidt algorithms
+'''
+
 def gramShmidt(matV):
     height, width = matV.size()
     matU = np.ndarray(height, width)
@@ -18,6 +23,10 @@ def gramShmidt(matV):
             matU[0:,iter] = matU[0:, iter]-(np.transpose(matU[0:,iter2])*matU[0:,iter])*matU[0:,iter2]
         matU[0:, iter] = matU[0:, iter]/np.norm(matU[0:, iter])
 
+
+'''
+This function encrypts the data using a Caesar cipher
+'''
 def encryption(input):
     matX = input.flatten()
     print(len(matX))
