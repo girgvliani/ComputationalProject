@@ -40,7 +40,6 @@ def encryption(input):
     print(matX)
     matK = createMatrix(matX)##TODO following code is not correct just for testing
     print(matK)
-    matX[0] = 255
     print(matX+matK)
 
 
