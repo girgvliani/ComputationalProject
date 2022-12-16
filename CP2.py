@@ -57,7 +57,7 @@ def transformXtoY(matX):
         matY.append(np.matmul(matX[(iter-1)*chunk*chunk:iter*chunk*chunk],matK))
         print(matX.size - iter*chunk*chunk)
         iter += 1
-    if iter*chunk*chunk > matX.size:
+    if iter*chunk*chunk > matX.size:  
         matK = createMatrix(matX[(iter-1)*chunk*chunk:])
         matY.append(np.matmul(matX[(iter-1)*chunk*chunk:],matK))
 
@@ -76,17 +76,45 @@ def transformZtoZhat(matY, matZ):
 This function changes the Least Significant Bit(LSB)
 and encodes a message using stego
 '''
-def lsb(matZ = 0, matY = 0):
-    testmat = []
-    binMatY = []
-    for submat in matY:
-        for element in submat:
-            binMatY.append(np.binary_repr(int(element), 9)) 
-            testmat.append(element)
-        
-    print(testmat)
+def lsb(matZ, matY):
+    iter = 1
+    binMatZ = (binaryTransform(matZ))
+    binMatY = (binaryTransform(matY))
     print(binMatY)
+    for iter1 in range(len(binMatY)):
+        ##i Chose 3 to change last 3 bits only
+        while iter*3 < len(binMatY[iter1]):
+            binMatY[(iter-1)*3:iter*3]
+            binMatZ
+            iter += 1
+        
 
+def unflatten(mat):
+    list = []
+    newlist = []
+    width = mat[-1]
+    print(width)
+    mat = mat[:-1]
+    height = 1
+    for i in range(0, len(mat), 3):
+        list.append([mat[i], mat[i+1], mat[i+2]])
+
+        if i + 3 == (3*width*height):
+            newlist.append(list)
+            height += 1
+            list = []
+
+    return np.array(newlist)
+
+
+
+def binaryTransform(mat):
+    binMatY = []
+    for submat in mat:
+        for element in submat:
+            binMatY.append(np.binary_repr(int(element), 10)) 
+
+    return binMatY
 
 '''
 This function encrypts the data using a Caesar cipher
@@ -94,11 +122,18 @@ This function encrypts the data using a Caesar cipher
 def encryption(input):
     matX = transformTtoX(input)#fllaten function flattens the whole input
     matY = transformXtoY(matX)
-    matZhat = lsb(0, matY)
+    matZhat = lsb(np.ndarray((5,5)), matY)
 
 
 
 if __name__ == '__main__':
-    input = "me var texti" #v2.imread("new_img.jpg")
-    encryption(input)
+    input = cv2.imread("new_img.jpg")
+    print(input)
+    
+    width = len(input[0])
+
+    input = input.flatten()
+    list = np.ndarray.tolist(input)
+    list.append(width)
+    print(unflatten(list))
 
