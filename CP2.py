@@ -52,7 +52,7 @@ def transformTtoX(input):
         list = np.ndarray.tolist(input)
         list.append(width)
 
-    print(list)
+    #print(list)
     return list
 
 def transformXtoY(matX):
@@ -63,22 +63,23 @@ def transformXtoY(matX):
     while iter*chunk*chunk < len(matX):
         matK = createMatrix(matX[(iter-1)*chunk*chunk:iter*chunk*chunk])
         matY.append(np.matmul(matX[(iter-1)*chunk*chunk:iter*chunk*chunk],matK))
-        print(matX.size - iter*chunk*chunk)
+        #print(matX.size - iter*chunk*chunk)
         iter += 1
 
     if iter*chunk*chunk > len(matX):  
         matK = createMatrix(matX[(iter-1)*chunk*chunk:])
-        matY.append(np.matmul(matX[(iter-1)*chunk*chunk:],matK))
+        something = np.matmul(matX[(iter-1)*chunk*chunk:],matK)
+        matY.append(something)
 
-    return matY
+    return listFlatten(matY)
 
+def listFlatten(lst):
+    retLst = []
+    for sub in lst:
+        for element in sub:
+            retLst.append(element)
+    return retLst
 
-'''
-this function hides matK in matZ
-and creates matZhat which is hidden from plain sight
-'''
-def transformZtoZhat(matY, matZ):
-    pass
 
 
 '''
@@ -86,29 +87,35 @@ This function changes the Least Significant Bit(LSB)
 and encodes a message using stego
 '''
 def lsb(matZ, matY):
-    print(matY)
-    print(matZ)
-    iter = 1
-    iterz = 0
+    bool = False
+    strIter = 1
+    lstIter1 = 0
     binMatZ = binaryTransform(matZ)
     binMatY = (binaryTransform(matY))
-    print(binMatY)
-    for iter1 in range(len(binMatY)):
-        iter = 1
-        ##i Chose 3 to change last 3 bits only
-        while iter*3 <= len(binMatY[iter1]):
-            if iterz <= len(binMatZ):
-                binMatZ[iterz] = binMatZ[iterz][:-2]
-                binMatZ[iterz] +=  binMatY[iter1][(iter-1)*3:iter*3]     
-                iter += 1
-                iterz += 1
-            else:
-                binMatZ[iterz] = binMatZ[iterz][:-2]
-                binMatZ[iterz] += '000'
-                print(binMatZ[iterz])      
-                iter += 1
+    print(binMatZ[0:15])
+    for k in range(len(binMatZ)):
 
-    print(binMatZ)
+        if lstIter1 < len(binMatY):
+            if strIter * 3 > len(binMatY[lstIter1]):
+                strIter = 1
+                lstIter1 += 1
+                if lstIter1  == len(binMatY):
+                    lstIter1 -= 1
+                    bool = True
+
+            if k <= len(binMatY)*4:
+                binMatZ[k] = binMatZ[k][:-3]
+                binMatZ[k] +=  binMatY[lstIter1][(strIter-1)*3:strIter*3]
+                strIter += 1
+
+            if bool == True:
+                lstIter1 += 1
+
+        else:
+            binMatZ[k] = binMatZ[k][:-3]
+            binMatZ[k] += "000"
+
+    print(binMatZ[0:50])
         
 
 def unflatten(mat):
@@ -130,11 +137,10 @@ def unflatten(mat):
 
 
 
-def binaryTransform(mat):
+def binaryTransform(lst):
     binMatY = []
-    for submat in mat:
-        for element in submat:
-            binMatY.append(np.binary_repr(int(element), 9)) 
+    for element in lst:
+       binMatY.append(np.binary_repr(int(element), 12)) 
 
     return binMatY
 
@@ -144,8 +150,8 @@ This function encrypts the data using a Caesar cipher
 def encryption(input):
     matX = transformTtoX(input)
     matY = transformXtoY(matX)
-    widthZ = len(cv2.imread("svaneti.JPG")[0])
-    listZ = np.ndarray.tolist(cv2.imread("svaneti.JPG").flatten())
+    widthZ = len(cv2.imread("new_img.jpg")[0])
+    listZ = np.ndarray.tolist(cv2.imread("new_img.jpg").flatten())
     listZ.append(widthZ)
     matZhat = lsb(listZ, matY)
 
@@ -153,9 +159,7 @@ def encryption(input):
 
 if __name__ == '__main__':
     input = "me"#cv2.imread("new_img.jpg")
-    print(input)
     encryption(input)
-   
 
     '''
     width = len(input[0])
