@@ -27,9 +27,6 @@ def fillMatrix(matrix, k):
 GramShmidt algorithms
 '''
 def gramShmidt(matV):
-    if matV == 0:
-        print("suck me")
-        return
     height, width = matV.size()
     matU = np.ndarray(height, width)
     matU[0:, 0] = matV[0:, 0]/np.linalg.norm(matV[0:, 0])
@@ -89,9 +86,11 @@ This function changes the Least Significant Bit(LSB)
 and encodes a message using stego
 '''
 def lsb(matZ, matY):
+    print(matY)
+    print(matZ)
     iter = 1
     iterz = 0
-    binMatZ = matZ
+    binMatZ = binaryTransform(matZ)
     binMatY = (binaryTransform(matY))
     print(binMatY)
     for iter1 in range(len(binMatY)):
@@ -145,7 +144,9 @@ This function encrypts the data using a Caesar cipher
 def encryption(input):
     matX = transformTtoX(input)
     matY = transformXtoY(matX)
-    listZ = ['000100000','001000000','001100000','010000000','010100000','011000000','011100000','100000000','100100000','101000000','101100000','110000000']
+    widthZ = len(cv2.imread("svaneti.JPG")[0])
+    listZ = np.ndarray.tolist(cv2.imread("svaneti.JPG").flatten())
+    listZ.append(widthZ)
     matZhat = lsb(listZ, matY)
 
 
