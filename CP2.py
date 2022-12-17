@@ -6,7 +6,7 @@ This function must create a matrix
 with the sizes suitable for matX
 '''
 def createMatrix(matX, coeficient = 2):
-    matrix = np.ndarray((matX.size,matX.size))
+    matrix = np.ndarray((len(matX),len(matX)))
     matrix.fill(0)
     return fillMatrix(matrix, coeficient)
 
@@ -40,24 +40,36 @@ def gramShmidt(matV):
         matU[0:, iter] = matU[0:, iter]/np.norm(matU[0:, iter])
 
 def transformTtoX(input):
-    matrix = np.ndarray(len(input))
+    width = 0
+    list = []
+
     if type(input) == str:
+        stringIdentifier = 3
         for iter in range(0,len(input)):
-            matrix[iter] = ord(input[iter])
+            list.append(ord(input[iter]))
+        list.append(stringIdentifier)
+
     elif type(input) == np.ndarray:
-        return input.flatten()
-    return matrix
+        width = len(input[0])
+        input = input.flatten()
+        list = np.ndarray.tolist(input)
+        list.append(width)
+
+    print(list)
+    return list
 
 def transformXtoY(matX):
     chunk = 20
     matY = []
     iter = 1
-    while iter*chunk*chunk < matX.size:
+
+    while iter*chunk*chunk < len(matX):
         matK = createMatrix(matX[(iter-1)*chunk*chunk:iter*chunk*chunk])
         matY.append(np.matmul(matX[(iter-1)*chunk*chunk:iter*chunk*chunk],matK))
         print(matX.size - iter*chunk*chunk)
         iter += 1
-    if iter*chunk*chunk > matX.size:
+
+    if iter*chunk*chunk > len(matX):  
         matK = createMatrix(matX[(iter-1)*chunk*chunk:])
         matY.append(np.matmul(matX[(iter-1)*chunk*chunk:],matK))
 
@@ -76,29 +88,81 @@ def transformZtoZhat(matY, matZ):
 This function changes the Least Significant Bit(LSB)
 and encodes a message using stego
 '''
-def lsb(matZ = 0, matY = 0):
-    testmat = []
+def lsb(matZ, matY):
+    iter = 1
+    iterz = 0
+    binMatZ = matZ
+    binMatY = (binaryTransform(matY))
+    print(binMatY)
+    for iter1 in range(len(binMatY)):
+        iter = 1
+        ##i Chose 3 to change last 3 bits only
+        while iter*3 <= len(binMatY[iter1]):
+            if iterz <= len(binMatZ):
+                binMatZ[iterz] = binMatZ[iterz][:-2]
+                binMatZ[iterz] +=  binMatY[iter1][(iter-1)*3:iter*3]     
+                iter += 1
+                iterz += 1
+            else:
+                binMatZ[iterz] = binMatZ[iterz][:-2]
+                binMatZ[iterz] += '000'
+                print(binMatZ[iterz])      
+                iter += 1
+
+    print(binMatZ)
+        
+
+def unflatten(mat):
+    list = []
+    newlist = []
+    width = mat[-1]
+    print(width)
+    mat = mat[:-1]
+    height = 1
+    for i in range(0, len(mat), 3):
+        list.append([mat[i], mat[i+1], mat[i+2]])
+
+        if i + 3 == (3*width*height):
+            newlist.append(list)
+            height += 1
+            list = []
+
+    return np.array(newlist)
+
+
+
+def binaryTransform(mat):
     binMatY = []
-    for submat in matY:
+    for submat in mat:
         for element in submat:
             binMatY.append(np.binary_repr(int(element), 9)) 
-            testmat.append(element)
-        
-    print(testmat)
-    print(binMatY)
 
+    return binMatY
 
 '''
 This function encrypts the data using a Caesar cipher
 '''
 def encryption(input):
-    matX = transformTtoX(input)#fllaten function flattens the whole input
+    matX = transformTtoX(input)
     matY = transformXtoY(matX)
-    matZhat = lsb(0, matY)
+    listZ = ['000100000','001000000','001100000','010000000','010100000','011000000','011100000','100000000','100100000','101000000','101100000','110000000']
+    matZhat = lsb(listZ, matY)
 
 
 
 if __name__ == '__main__':
-    input = "me var texti" #v2.imread("new_img.jpg")
+    input = "me"#cv2.imread("new_img.jpg")
+    print(input)
     encryption(input)
+   
+
+    '''
+    width = len(input[0])
+    input = input.flatten()
+    list = np.ndarray.tolist(input)
+    list.append(width)
+    encryption(list)
+    cv2.imwrite("file.jpg",unflatten(list))
+    '''
+    
 
