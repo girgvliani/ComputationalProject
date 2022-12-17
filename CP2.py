@@ -92,7 +92,6 @@ def lsb(matZ, matY):
     lstIter1 = 0
     binMatZ = binaryTransform(matZ)
     binMatY = (binaryTransform(matY))
-    print(binMatZ[0:15])
     for k in range(len(binMatZ)):
 
         if lstIter1 < len(binMatY):
@@ -114,9 +113,8 @@ def lsb(matZ, matY):
         else:
             binMatZ[k] = binMatZ[k][:-3]
             binMatZ[k] += "000"
-
-    print(binMatZ[0:50])
         
+    return binMatZ
 
 def unflatten(mat):
     list = []
@@ -138,11 +136,19 @@ def unflatten(mat):
 
 
 def binaryTransform(lst):
-    binMatY = []
+    binMat = []
     for element in lst:
-       binMatY.append(np.binary_repr(int(element), 12)) 
+       binMat.append(np.binary_repr(int(element), 12)) 
 
-    return binMatY
+    return binMat
+
+def decimalTransform(lst):
+    decimalMat = []
+    for element in lst:
+       decimalMat.append(int(element,2)) 
+
+    return decimalMat
+
 
 '''
 This function encrypts the data using a Caesar cipher
@@ -154,6 +160,9 @@ def encryption(input):
     listZ = np.ndarray.tolist(cv2.imread("new_img.jpg").flatten())
     listZ.append(widthZ)
     matZhat = lsb(listZ, matY)
+    matZhat = decimalTransform(matZhat)
+    matZhat = unflatten(matZhat)
+    cv2.imwrite("file.jpg", matZhat)
 
 
 
