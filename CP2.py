@@ -116,13 +116,14 @@ def lsb(matZ, matY):
         
     return binMatZ
 
-def unflatten(mat):
+def unflatten(mat, width = 0):
     list = []
     newlist = []
-    width = mat[-1]
-    print(width)
-    mat = mat[:-1]
     height = 1
+    if width == 0:
+        width = mat[-1]
+        mat = mat[:-1]
+
     for i in range(0, len(mat), 3):
         list.append([mat[i], mat[i+1], mat[i+2]])
 
@@ -156,18 +157,19 @@ This function encrypts the data using a Caesar cipher
 def encryption(input):
     matX = transformTtoX(input)
     matY = transformXtoY(matX)
-    widthZ = len(cv2.imread("new_img.jpg")[0])
-    listZ = np.ndarray.tolist(cv2.imread("new_img.jpg").flatten())
-    listZ.append(widthZ)
+    imgZ = cv2.imread("DOG.JPG")
+    widthZ = len(imgZ[0])
+    imgZ = imgZ.flatten()
+    listZ = np.ndarray.tolist(imgZ)
     matZhat = lsb(listZ, matY)
     matZhat = decimalTransform(matZhat)
-    matZhat = unflatten(matZhat)
+    matZhat = unflatten(matZhat, widthZ)
     cv2.imwrite("file.jpg", matZhat)
 
 
 
 if __name__ == '__main__':
-    input = "me"#cv2.imread("new_img.jpg")
+    input = cv2.imread("new_img.jpg")
     encryption(input)
 
     '''
@@ -178,5 +180,7 @@ if __name__ == '__main__':
     encryption(list)
     cv2.imwrite("file.jpg",unflatten(list))
     '''
+    
+    
     
 
