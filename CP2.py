@@ -92,6 +92,8 @@ def lsb(matZ, matY):
     lstIter1 = 0
     binMatZ = binaryTransform(matZ)
     binMatY = (binaryTransform(matY))
+    print(binMatY)
+    print(binMatZ[0:14])
     for k in range(len(binMatZ)):
 
         if lstIter1 < len(binMatY):
@@ -113,7 +115,8 @@ def lsb(matZ, matY):
         else:
             binMatZ[k] = binMatZ[k][:-3]
             binMatZ[k] += "000"
-        
+    
+    print(binMatZ[0:14])
     return binMatZ
 
 def unflatten(mat, width = 0):
@@ -139,7 +142,7 @@ def unflatten(mat, width = 0):
 def binaryTransform(lst):
     binMat = []
     for element in lst:
-       binMat.append(np.binary_repr(int(element), 12)) 
+       binMat.append(bin(int(element), 12)) 
 
     return binMat
 
@@ -149,6 +152,71 @@ def decimalTransform(lst):
        decimalMat.append(int(element,2)) 
 
     return decimalMat
+
+def extractYfromZ(lst):
+    length = len(lst) - 1
+    binaryLst = binaryTransform(lst)
+    tempLst = ""
+    retLst = []
+    '''while length > 0:
+        if binaryLst[length][-3:] != "000":
+            for i in range(length):
+                if i % 4 == 0:
+                    tempLst += binaryLst[i][-3:]
+                    retLst.append(tempLst)
+                    tempLst = []
+                else:
+                    tempLst += binaryLst[i][-3:]
+
+        length -= 1
+    '''
+    print(binaryLst[0:14])
+        
+    return retLst
+
+    return "error"
+
+def extractXfromY(lst, k):
+    ##this part of the code only workd for K matrox = k constant * I identity(nxn)
+    chunk = 20
+    width = int(lst[-1],2)
+    lst = decimalTransform(lst[:-1])
+    matX = []
+    iter = 1
+
+    while iter*chunk*chunk < len(lst):
+        matK = createMatrix(lst[(iter-1)*chunk*chunk:iter*chunk*chunk], 1/k)
+        matX.append(np.matmul(lst[(iter-1)*chunk*chunk:iter*chunk*chunk],matK))
+        #print(matX.size - iter*chunk*chunk)
+        iter += 1
+
+ 
+    matK = createMatrix(lst[(iter-1)*chunk*chunk:], 1/k)
+    something = np.matmul(lst[(iter-1)*chunk*chunk:], matK)
+    matX.append(something)
+
+    matX = listFlatten(matX)
+    
+    if width == 3:
+        return matX
+
+    else:
+        print(width)
+        return unflatten(matX, width)
+
+
+
+
+def decrypt(image, k):
+    image = image.flatten()
+    lstY = extractYfromZ(np.ndarray.tolist(image))
+    if lstY == "error":
+        return -1
+    print(lstY)
+    lstX = extractXfromY(lstY, k)
+
+    return lstX
+
 
 
 '''
@@ -169,18 +237,14 @@ def encryption(input):
 
 
 if __name__ == '__main__':
-    input = cv2.imread("new_img.jpg")
+    input = "me"#cv2.imread("new_img.jpg")
     encryption(input)
-
-    '''
-    width = len(input[0])
-    input = input.flatten()
-    list = np.ndarray.tolist(input)
-    list.append(width)
-    encryption(list)
-    cv2.imwrite("file.jpg",unflatten(list))
-    '''
+    input = cv2.imread("file.jpg")
+    decrypted = decrypt(input, 2)
+    print(decrypted[0:4])
+    cv2.imwrite("decrypted.jpg", decrypted)
     
+
     
     
 
