@@ -52,7 +52,7 @@ def transformTtoX(input):
         list = np.ndarray.tolist(input)
         list.append(width)
 
-    #print(list)
+    #print(list[-1])
     return list
 
 def transformXtoY(matX):
@@ -137,7 +137,9 @@ def unflatten(mat, width = 0):
             newlist.append(list)
             height += 1
             list = []
-
+    
+    #print(newlist)
+    #print("unflatten")
     return np.array(newlist)
 
 
@@ -170,16 +172,17 @@ def extractYfromZ(lstZ):
                     tempLst = ""
                     iter -= 1
                 else:
-                    print("binaryLst[iter][-3:]")
-                    print(binaryLst[iter][-3:])
+                    #print("binaryLst[iter][-3:]")
+                    #print(binaryLst[iter][-3:])
                     tempLst += binaryLst[iter][-3:]
                 iter += 1
             retLst.append(tempLst)
             return retLst
         length -= 1
     
-    print("lstZ[0:14]")
-    print(lstZ[0:14])
+    
+    #print(lstZ[0:14])
+    #print("lstZ[0:14]")
         
     return retLst
 
@@ -189,11 +192,11 @@ def extractXfromY(lstY, k):
     ##this part of the code only workd for K matrox = k constant * I identity(nxn)
     k = 1/k
     chunk = 20
-    print("lstY[0:14] 2")
-    print(lstY[0:14])
+    #print("lstY[0:14] 2")
+    #print(lstY[0:14])
     lstY = decimalTransform(lstY)
     width = lstY[-1]
-    lstY = lstY[:-1]
+    lstY = lstY
     lstX = []
     iter = 1
 
@@ -203,28 +206,50 @@ def extractXfromY(lstY, k):
         #print(matX.size - iter*chunk*chunk)
         iter += 1
 
-    print("lstY")
-    print(lstY)
-    print("lstY[(iter-1)*chunk*chunk:]")
-    print(lstY[(iter-1)*chunk*chunk:])
+    #print("lstY")
+    #print(lstY)
+    #print("lstY[(iter-1)*chunk*chunk:]")
+    #print(lstY[(iter-1)*chunk*chunk:])
     matK = createMatrix(lstY[(iter-1)*chunk*chunk:], k)
     listX = np.matmul(lstY[(iter-1)*chunk*chunk:], matK)
-    print("matK")
-    print(matK)
-    print("listX")
-    print(listX)
-    lstX.append(listX)
+    #print("matK")
+    #print(matK)
+    #print("listX")
+    #print(listX)
+    #lstX.append(listX)
+    #print("lstX")
+    #print(lstX)
     retLstX = []
+    width = listX[-1]
+    #print("width")
+    #print(width)
+    listX = listX[:-1]
+    #print("ListX")
+    #print(listX)
 
-    for element in listX:
-        retLstX.append(chr(int(element)))
     
     if width == 3:
-        return retLstX
+        stringX = ""
+        for element in listX:
+            stringX += (chr(int(element)))
+        
+        return stringX
 
     else:
-        print(retLstX)
-        return unflatten(lstX, width)
+        width = listX[-1]
+
+        listX = listX[:-1] 
+        for element in listX:
+            retLstX.append(int(element))
+
+        #print("width")
+        #print(width)#
+        img =  unflatten(retLstX, width)
+        #print(img)
+        
+        #print(img)
+        cv2.imwrite("decrypted.jpg", img)
+        return -1
 
 
 
@@ -234,10 +259,12 @@ def decrypt(image, k):
     lstY = extractYfromZ(np.ndarray.tolist(image))
     if lstY == "error":
         return -1
-    print("lstY decrypt")
-    print(lstY)
+    #print("lstY decrypt")
+    #print(lstY)
     lstX = extractXfromY(lstY, k)
 
+    if lstX == -1:
+        return 
     return lstX
 
 
@@ -247,11 +274,11 @@ This function encrypts the data using a Caesar cipher
 '''
 def encryption(input):
     matX = transformTtoX(input)
-    print("matX:")
-    print(matX)
+    #print("matX:")
+    #print(matX)
     matY = transformXtoY(matX)
-    print("matY :")
-    print(matY)
+    #print("matY :")
+    #print(matY)
     imgZ = cv2.imread("DOG.JPG")
     widthZ = len(imgZ[0])
     imgZ = imgZ.flatten()
@@ -265,14 +292,16 @@ def encryption(input):
 
 
 if __name__ == '__main__':
-    input = "me var"#cv2.imread("new_img.jpg")
+    print("please enter a text to encrypt")
+    input = input()#"rato ar vmushaob imageze ver vxvdebi"#cv2.imread("new_img.jpg")
     imgz = cv2.imread("DOG.JPG")
-    print("imgz:")
-    print(imgz[0,0])
+    #print("imgz:")
+    #print(imgz[0,0])
     encrypted = encryption(input)
-    print(encrypted[0,0])
+    #print(encrypted[0,0])
     decrypted = decrypt(encrypted, 2)
-    print(decrypted[0:4])
+    print("decrypted message:")
+    print(decrypted)
     
 
     
