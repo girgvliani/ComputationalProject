@@ -1,0 +1,11 @@
+I want to make this useful for encrypting user id into the video
+
+        the least ammount of data being streamed by movie is 1280x720p it cointains 921600 pixels and 2764800 values    
+        ascii has 127 value so if we want we can also save text data
+        but in My opinion the best use for it would be encrypting user id s into the video files
+
+
+//////
+Code will be ready soon
+
+/////
